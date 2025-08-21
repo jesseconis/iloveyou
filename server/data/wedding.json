@@ -1,0 +1,25 @@
+{
+  "wedding": {
+    "date": "2025-09-01T18:00:00.000Z",
+    "venue": "TBD",
+    "timezone": "Australia/Brisbane",
+    "title": "JAC's Marriage",
+    "couple": {
+      "bride": "Ashleigh",
+      "groom": "Jesse"
+    }
+  },
+  "countdown": {
+    "completedMessage": "The Wedding Day Has Arrived! 🎉",
+    "labels": {
+      "days": "DAYS",
+      "hours": "HOURS", 
+      "minutes": "MINUTES",
+      "seconds": "SECONDS"
+    }
+  },
+  "settings": {
+    "allowUpdates": true,
+    "lastUpdated": "2025-01-01T00:00:00.000Z"
+  }
+}
