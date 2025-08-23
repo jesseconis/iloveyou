@@ -1,9 +1,11 @@
 import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import { cors } from 'hono/cors';
-import countdownRoute from './routes/countdown';
+import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi';
+import { swaggerUI } from '@hono/swagger-ui';
+import wedding from './routes/wedding';
 
-const app = new Hono();
+const app = new OpenAPIHono();
 
 // Enable CORS for the Vite dev server
 app.use('*', cors({
@@ -13,10 +15,30 @@ app.use('*', cors({
 }));
 
 // API routes
-app.route('/api/countdown', countdownRoute);
+app.route('/api/wedding', wedding);
 
 // Health check endpoint
-app.get('/health', (c) => {
+const healthRoute = createRoute({
+  method: 'get',
+  path: '/health',
+  tags: ['Health'],
+  responses: {
+    200: {
+      content: {
+        'application/json': {
+          schema: z.object({
+            status: z.string(),
+            timestamp: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+      description: 'Server health status',
+    },
+  },
+});
+
+app.openapi(healthRoute, (c) => {
   return c.json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
@@ -24,23 +46,18 @@ app.get('/health', (c) => {
   });
 });
 
-// Root endpoint with API documentation
-app.get('/', (c) => {
-  return c.json({
-    message: 'Wedding Countdown API Server',
+// The OpenAPI documentation will be available at /doc
+app.doc('/doc', {
+  openapi: '3.0.0',
+  info: {
     version: '1.0.0',
-    endpoints: {
-      'GET /health': 'Server health check',
-      'GET /api/countdown': 'Get wedding countdown data',
-      'POST /api/countdown/update-date': 'Update wedding date',
-      'GET /api/countdown/config': 'Get full wedding configuration'
-    },
-    example: {
-      countdown: 'GET http://localhost:3001/api/countdown',
-      updateDate: 'POST http://localhost:3001/api/countdown/update-date'
-    }
-  });
+    title: 'Wedding Countdown API',
+    description: 'I LOVE YOU ASHLEIGH 💖',
+  },
 });
+
+// Swagger UI
+app.get('/api/doc', swaggerUI({ url: '/doc' }));
 
 // 404 handler
 app.notFound((c) => {
